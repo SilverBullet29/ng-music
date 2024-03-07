@@ -5,6 +5,7 @@ export default function useResultModel() {
     data: listMusic,
     mutate,
     isPending: isLoading,
+    variables,
   } = musicQueries.useQueryMusic();
-  return { mutate, listMusic, isLoading };
+  return { mutate, listMusic, isLoading, variables };
 }

@@ -8,12 +8,12 @@ const Result = () => {
   const {
     listMusic,
     renderItem,
-    keyword,
     onClickSearchIcon,
     onClickLoadMore,
     onChangeInputKeyword,
     onClickSearch,
     modalRef,
+    variables,
     isLoading,
     isDisabled,
   } = useResultViewController();
@@ -26,15 +26,19 @@ const Result = () => {
         <p className="my-10 text-sm font-medium tracking-wider text-neutral-500">
           {`Search result for:`}
           <span className="ml-[10px] text-lg font-bold text-primary-600">
-            {keyword}
+            {variables?.term}
           </span>
         </p>
         <div className="flex h-fit w-full flex-col items-center gap-4 overflow-y-scroll px-[15px] pb-6">
           {isLoading && listMusic?.resultCount && (
             <Spinner color="purple" size="lg" />
           )}
-          {listMusic?.results?.map(renderItem)}
-          {!isLoading && (
+          {listMusic?.results.length && !isLoading ? (
+            listMusic?.results?.map(renderItem)
+          ) : (
+            <p>Data not found</p>
+          )}
+          {!isLoading && !!listMusic?.results?.length && (
             <Button
               variant="tertiary"
               className="min-h-[34px] min-w-[120px]"

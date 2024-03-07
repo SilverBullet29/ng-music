@@ -8,9 +8,9 @@ import MusicCard from "../components/MusicCard";
 export default function useResultViewController() {
   const modalRef = useRef<ModalRef>(null);
   const [searchParams] = useSearchParams();
-  const [keyword, setKeyword] = useState<string>(searchParams.get("q") ?? "");
+  const [keyword, setKeyword] = useState<string>("");
   const [limit, setLimit] = useState<number>(4);
-  const { mutate, listMusic, isLoading } = useResultModel();
+  const { mutate, listMusic, isLoading, variables } = useResultModel();
 
   const onChangeInputKeyword = (e: React.FormEvent<HTMLInputElement>) => {
     setKeyword(e.currentTarget.value);
@@ -24,10 +24,10 @@ export default function useResultViewController() {
     mutate({ term: keyword ?? "", limit });
   }, [keyword, limit, mutate]);
 
-  const onClickLoadMore = () => {
+  const onClickLoadMore = useCallback(() => {
     setLimit((prev) => prev + 4);
-    getMusic();
-  };
+    mutate({ term: keyword ?? "", limit: limit + 4 });
+  }, [keyword, limit, mutate]);
 
   const onClickSearch = useCallback(() => {
     getMusic();
@@ -37,13 +37,14 @@ export default function useResultViewController() {
   const isDisabled = useMemo(() => !keyword, [keyword]);
 
   const renderItem = useCallback(
-    (item: Music.Item) => <MusicCard {...item} />,
+    (item: Music.Item) => <MusicCard key={item.trackId} {...item} />,
     [],
   );
 
   useEffect(() => {
     if (searchParams.get("q")) {
       mutate({ term: searchParams.get("q") ?? "", limit });
+      setKeyword(searchParams.get("q") ?? "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -55,6 +56,7 @@ export default function useResultViewController() {
     listMusic,
     isLoading,
     renderItem,
+    variables,
     onChangeInputKeyword,
     onClickSearchIcon,
     onClickLoadMore,
